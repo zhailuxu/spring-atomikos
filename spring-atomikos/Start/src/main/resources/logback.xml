@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+
+	<include
+		resource="org/springframework/boot/logging/logback/base.xml" />
+
+	<springProperty scope="context"
+		name="agoo.job.logging.root" source="agoo.job.logging.root"
+		defaultValue="/Users/zhuizhumengxiang/logs" />
+	<springProperty scope="context"
+		name="agoo.job.logging.level" source="agoo.job.logging.level"
+		defaultValue="WARN" />
+
+
+	<appender name="ERROR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${agoo.job.logging.root}/error.log</file>
+		<append>true</append>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${agoo.job.logging.root}/error.log.%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%level] [%logger] -
+				%msg%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+
+
+	<appender name="applicationAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${agoo.job.logging.root}/application.log</file>
+		<append>true</append>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${agoo.job.logging.root}/application.log.%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%m%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+	<appender name="asynApplicationAppender"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="applicationAppender" />
+	</appender>
+
+
+	<appender name="createTaskAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${agoo.job.logging.root}/agoo_create_task.log</file>
+		<append>true</append>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${agoo.job.logging.root}/agoo_create_task.log.%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%m%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+	<appender name="asynCreateTaskLogger"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="createTaskAppender" />
+	</appender>
+
+
+	<appender name="taskMsgAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${agoo.job.logging.root}/agoo_send_task.log</file>
+		<append>true</append>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${agoo.job.logging.root}/agoo_send_task.log.%d{yyyy-MM-dd}
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}|%m%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+	<appender name="asynTaskMsgAppender"
+		class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="taskMsgAppender" />
+	</appender>
+	<logger name="taskMsgLog" additivity="false">
+		<level value="${agoo.log.logging.level}" />
+		<appender-ref ref="asynTaskMsgAppender" />
+	</logger>
+
+
+	<logger name="createTaskLog" additivity="false">
+		<level value="${agoo.log.logging.level}" />
+		<appender-ref ref="asynCreateTaskLogger" />
+	</logger>
+
+
+	<logger name="errorLog" additivity="false">
+		<level value="${agoo.log.logging.level}" />
+		<appender-ref ref="ERROR" />
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="asynApplicationAppender" />
+	</root>
+</configuration>

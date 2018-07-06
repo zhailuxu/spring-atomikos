@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd   
+	                    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd   
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd   
+	                    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd   
+	                    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<!-- mysql数据源1 -->
+	<bean id="mysqlDataSource1" class="com.atomikos.jdbc.AtomikosDataSourceBean"
+		init-method="init" destroy-method="close">
+		<description>master xa datasource</description>
+		<property name="uniqueResourceName">
+			<value>master</value>
+		</property>
+		<property name="xaDataSourceClassName"
+			value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+		<property name="xaProperties">
+			<props>
+				<prop key="user">root</prop>
+				<prop key="password">123456</prop>
+				<prop key="URL">jdbc:mysql://127.0.0.1:3306/test</prop>
+			</props>
+		</property>
+		<property name="poolSize" value="10" />
+	</bean>
+
+	<!-- mysql数据源2 -->
+	<bean id="mysqlDataSource2" class="com.atomikos.jdbc.AtomikosDataSourceBean"
+		init-method="init" destroy-method="close">
+		<description>slave xa datasource</description>
+		<property name="uniqueResourceName">
+			<value>slave</value>
+		</property>
+		<property name="xaDataSourceClassName">
+			<value>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</value>
+		</property>
+		<property name="xaProperties">
+			<props>
+				<prop key="user">root</prop>
+				<prop key="password">123456</prop>
+				<prop key="URL">jdbc:mysql://127.0.0.1:3306/test</prop>
+			</props>
+		</property>
+		<property name="poolSize" value="10" />
+	</bean>
+
+	<!-- atomikos事务管理器 -->
+	<bean id="atomikosTransactionManager"
+		class="com.atomikos.icatch.jta.UserTransactionManager"
+		init-method="init" destroy-method="close">
+		<description>UserTransactionManager</description>
+		<property name="forceShutdown">
+			<value>true</value>
+		</property>
+	</bean>
+
+	<!-- atomikos用户事务管理 -->
+	<bean id="atomikosUserTransaction"
+		class="com.atomikos.icatch.jta.UserTransactionImp">
+		<property name="transactionTimeout" value="300" />
+	</bean>
+
+	<!-- spring 事务管理器 -->
+	<bean id="springTransactionManager"
+		class="org.springframework.transaction.jta.JtaTransactionManager">
+		<property name="transactionManager">
+			<ref bean="atomikosTransactionManager" />
+		</property>
+		<property name="userTransaction">
+			<ref bean="atomikosUserTransaction" />
+		</property>
+	</bean>
+
+	<!-- mysql数据源1对应的jdbc模板 -->
+	<bean id="Mysql1JdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="mysqlDataSource1" />
+		</constructor-arg>
+	</bean>
+	
+	<!-- mysql数据源2对应的jdbc模板 -->
+	<bean id="Mysql2JdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="mysqlDataSource2" />
+		</constructor-arg>
+	</bean>
+
+	<context:annotation-config />
+	<tx:annotation-driven
+		transaction-manager="springTransactionManager" />
+
+</beans>

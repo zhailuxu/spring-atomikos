@@ -1,0 +1,2 @@
+{"id":"30.129.136.147.tm153088331517500001","wasCommitted":true,"participants":[{"uri":"30.129.136.147.tm1","state":"COMMITTING","expires":1530883325282,"resourceName":"master"},{"uri":"30.129.136.147.tm2","state":"COMMITTING","expires":1530883325282,"resourceName":"slave"}]}
+{"id":"30.129.136.147.tm153088331517500001","wasCommitted":true,"participants":[{"uri":"30.129.136.147.tm1","state":"TERMINATED","expires":1530883325309,"resourceName":"master"},{"uri":"30.129.136.147.tm2","state":"TERMINATED","expires":1530883325309,"resourceName":"slave"}]}
